@@ -31,4 +31,4 @@ mfprimecoefs(f,B, flag = 0) = {
     my(val2 = Map(matrix(G2.mod,2,i,j,if(j == 1,i-1,chareval(G2,lift(eps2),i-1,nthroot)))));
     return(Map(matrix(#pr,2,i,j,if(j == 1,pr[i],if(pr[i] == 0,mfcsteisenstein(k,G1,lift(eps1),G2,lift(eps2),nthroot),[mapget(val1,pr[i]%G1.mod),(pr[i]^(k-1))*mapget(val2,pr[i]%G2.mod)])))))
 }
-addhelp(mfprimecoefs,"There is two behaviours to this function. If f is a PARI modular form, it output a Map that give the Fourier coefficients of prime index of f up to B. If f is an Eisenstein series E_{k}^{eps1,eps2} represented by [k,G1,eps1,G2,eps2,nthroot], it output a Map that give for all the prime number up to B, [eps1(p),p^{k-1}eps2(p)]. If flag = 1, also give the constant coefficient.");
+addhelp(mfprimecoefs,"There is two behaviours to this function. If f is a PARI modular form, it output a Map that give the Fourier coefficients of prime index of f up to B. If f is an Eisenstein series E_{k}^{eps1,eps2} represented by [k,eps1,eps2,nthroot], it output a Map that give for all the prime number up to B, [eps1(p),p^{k-1}eps2(p)]. If flag = 1, also give the constant coefficient.");

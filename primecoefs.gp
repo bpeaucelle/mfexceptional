@@ -26,6 +26,9 @@ mfprimecoefs(f,B, flag = 0) = {
       return(Map(matrix(#pr,2,i,j,if(j == 1,pr[i],vf[pr[i]+1]))))
     );
     my([k,eps1,eps2,nthroot] = f,G1,G2);
+	if(type(eps1) == "t_VEC", eps1 = Mod(eps1[1],eps1[2]));
+	if(type(eps2) == "t_VEC", eps2 = Mod(eps2[1],eps2[2]));
+	
     if(#f == 4, G1 = znstar(eps1.mod,1); G2 = znstar(eps2.mod,1), [G1,G2] = f[5..6]);
     my(val1 = Map(matrix(G1.mod,2,i,j,if(j == 1,i-1,chareval(G1,lift(eps1),i-1,nthroot)))));
     my(val2 = Map(matrix(G2.mod,2,i,j,if(j == 1,i-1,chareval(G2,lift(eps2),i-1,nthroot)))));

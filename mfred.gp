@@ -1,4 +1,4 @@
-read("chars.gp");
+read("params.gp");
 read("res_fields.gp");
 read("bounds.gp");
 read("primecoefs.gp");
@@ -10,7 +10,6 @@ mfreducible(f,flag = 0) = {
 	my([G,eps] = znchar(eps), eps_ord = charorder(G,eps));										
 
 /* Compute the absolute extension Kf/Q */
-	print("rnfequation");
 
 	my([Pfabs,nthroot,a] = rnfequation(Pfcyclo,Pf,1));  \\Compute an absolute polynomial defining Kf.
 	my(nthroot_abs = [nthroot,eps_ord]);			    \\nthroot_abs is the generator of Q(eps) and y-a*nthroot_abs is a root of Pf.
@@ -18,17 +17,15 @@ mfreducible(f,flag = 0) = {
 	
 /* Compute the possible parameters for the small primes */
 
-	print("small primes");
-
 	my(small_pr = [p | p <- [2..max(k+1,N*eulerphi(N))], isprime(p) && (p <= k+1 || (N*eulerphi(N))%p == 0)]); \\Compute the set of small primes
 	my(params = List(),l,lambda,L);
 	for(i = 1,#small_pr,
 		l = small_pr[i]; lambda = factor_ideal(Pfabs,l); \\ Compute the prime ideals above l in Kf/Q
 		
-		if(lambda == "dede",
+		if(lambda == "index",
 			if(flag == 0,
 			
-				listput(reducible,[l,"dede"]),
+				listput(reducible,[l,"index"]),
 				
 				if(flag_Kf == 0, Kf = nfinit(Pfabs);flag_Kf = 1);
 				lambda = [nfmodprinit(Kf,L) | L <- idealprimedec(Kf,l)];
@@ -55,7 +52,6 @@ mfreducible(f,flag = 0) = {
 	
 /* Generate all the needed coefficients of f and compute the constant C */
 
-	print("Coefs");
 	my(vf = mfprimecoefs(f,max(Bmax,N)));	
 	my(C = -bernoulli(k,G,eps,nthroot_rel)/(2*k));
 	for(i = 1,#fa[,1],
@@ -64,7 +60,6 @@ mfreducible(f,flag = 0) = {
 	);
 
 /* Compute the big primes */
-	print("Big primes");
 	
 	my(big_params = red_params(N,k,G,eps,oo));	\\Compute the parameters for the big primes
 	my(big_pr = List(),nb_pr = #params, nb_ideals = List());
@@ -89,9 +84,9 @@ mfreducible(f,flag = 0) = {
 					pr = setsearch(big_pr,l,1); listinsert(big_pr,l,pr);					\\If no, add it to big_pr,
 					lambda = factor_ideal(Pfabs,l); s = nb_pr+sum(m = 1,pr-1,nb_ideals[m]);	\\compute the prime ideals in Kf above it,
 					
-					if(lambda == "dede",
+					if(lambda == "index",
 						if(flag == 0,
-							listput(reducible,[l,"dede"]); listinsert(nb_ideals,0,pr),
+							listput(reducible,[l,"index"]); listinsert(nb_ideals,0,pr),
 						
 							if(flag_Kf == 0, Kf = nfinit(Pfabs);flag_Kf = 1);
 							lambda = [nfmodprinit(Kf,p) | p <- idealprimedec(Kf,l)];
@@ -126,7 +121,6 @@ mfreducible(f,flag = 0) = {
 	
 /* Check congruences */
 	
-	print("Cong");
 	my(eps1,eps2,m1,m2,lambda,p,B,r,kdash,big,L);
 	for(i = 1,#params,
 		[lambda,p] = params[i];

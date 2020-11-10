@@ -9,7 +9,7 @@ addhelp(dede,"Apply the Dedekind criteria to determine if the prime number l div
 
 factor_ideal(P,l,fa = 0) = {
 	if(fa == 0, fa = factormod(P,l));
-	if(dede(P,l,fa) == 0, return("dede"));
+	if(dede(P,l,fa) == 0, return("index"));
 	
 	my(pr = List(),pol,gen);
 	for(i = 1,#fa[,1],

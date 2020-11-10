@@ -31,7 +31,7 @@ gp > Red[5]
 %9 = [[691, y, 0], [[0, 1], [0, 1], 0, 11]]
 ````
 
-If `flag = 1`, the computations are only done for the prime ideals which residue characteristic **does not** divide the index of the irreducible polynomial defining the coefficient field of `f`. When the degree of this polynomial is huge, it speeds up the computations but output only a partial information. However, the output includes also the prime numbers for which the computations could'n have been done, so that the exact list of reducible primes is a subset of the one given by the algorithm.
+If `flag = 0`, the computations are only done for the prime ideals which residue characteristic **does not** divide the index of the irreducible polynomial defining the coefficient field of `f`. When the degree of this polynomial is huge, it speeds up the computations but output only a partial information. However, the output includes also the prime numbers for which the computations could'n have been done, so that the exact list of reducible primes is a subset of the one given by the algorithm.
 
 ## Format of the output
 

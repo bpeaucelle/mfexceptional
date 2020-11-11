@@ -4,7 +4,7 @@ read("bounds.gp");
 read("primecoefs.gp");
 
 mfreducible(f,flag = 0) = {
-	my(reducible = List(),flag_Kf = 0);
+	my(reducible = List());
 	my([N,k,eps,Pf,Pfcyclo] = mfparams(f));
 	my(faN = factor(N));
 	my([G,eps] = znchar(eps), eps_ord = charorder(G,eps));										
@@ -18,20 +18,12 @@ mfreducible(f,flag = 0) = {
 /* Compute the possible parameters for the small primes */
 
 	my(small_pr = [p | p <- [2..max(k+1,N*eulerphi(N))], isprime(p) && (p <= k+1 || (N*eulerphi(N))%p == 0)]); \\Compute the set of small primes
-	my(params = List(),l,lambda,L);
+	my(params = List(),l,lambda,L,index_pr = List());
 	for(i = 1,#small_pr,
 		l = small_pr[i]; lambda = factor_ideal(Pfabs,l); \\ Compute the prime ideals above l in Kf/Q
 		
 		if(lambda == "index",
-			if(flag == 0,
-			
-				listput(reducible,[l,"index"]),
-				
-				if(flag_Kf == 0, Kf = nfinit(Pfabs);flag_Kf = 1);
-				lambda = [nfmodprinit(Kf,L) | L <- idealprimedec(Kf,l)];
-				for(j = 1,#lambda, listput(params, [[1,lambda[j]],red_params(N,k,G,eps,l,nthroot_abs,[Kf,lambda[j]])] ))
-			),
-			
+			if(flag == 0, listput(reducible,[l,"index"]), listput(index_pr,l)),
 			for(j = 1,#lambda, listput(params, [[0,lambda[j]],red_params(N,k,G,eps,l,nthroot_abs,[0,lambda[j]])]) )
 		)
 	);
@@ -48,19 +40,22 @@ mfreducible(f,flag = 0) = {
 			Bmax = max(Bmax,B);
 			mapput(bound_map,[pr,[eps1,eps2,m1,m2]],[B,r,kdash])
 		)
-	); Bmax = max(Bmax,get_Bred([N,faN],k,oo,a2,Mod(0,1),Mod(0,1),0,k-1)[1]);
-	
+	); 
+	for(i = 1,#index_pr,
+		Bmax = max(Bmax,get_Bmax([N,faN],k,index_pr[i],a2));
+	);	Bmax = max(Bmax,get_Bred([N,faN],k,oo,a2,Mod(0,1),Mod(0,1),0,k-1)[1]);
+
 /* Generate all the needed coefficients of f and compute the constant C */
 
 	my(vf = mfprimecoefs(f,max(Bmax,N)));	
 	my(C = -bernoulli(k,G,eps,nthroot_rel)/(2*k));
-	for(i = 1,#fa[,1],
-		af = mapget(vf,fa[i,1]);
-		C = C*af*(af - fa[i,1]^(k-1)*chareval(G,eps,fa[i,1],nthroot_rel))
+	for(i = 1,#faN[,1],
+		af = mapget(vf,faN[i,1]);
+		C = C*af*(af - faN[i,1]^(k-1)*chareval(G,eps,faN[i,1],nthroot_rel))
 	);
-
-/* Compute the big primes */
 	
+/* Compute the big primes */
+
 	my(big_params = red_params(N,k,G,eps,oo));	\\Compute the parameters for the big primes
 	my(big_pr = List(),nb_pr = #params, nb_ideals = List());
 	
@@ -85,16 +80,8 @@ mfreducible(f,flag = 0) = {
 					lambda = factor_ideal(Pfabs,l); s = nb_pr+sum(m = 1,pr-1,nb_ideals[m]);	\\compute the prime ideals in Kf above it,
 					
 					if(lambda == "index",
-						if(flag == 0,
-							listput(reducible,[l,"index"]); listinsert(nb_ideals,0,pr),
-						
-							if(flag_Kf == 0, Kf = nfinit(Pfabs);flag_Kf = 1);
-							lambda = [nfmodprinit(Kf,p) | p <- idealprimedec(Kf,l)];
-							for(m = 1,#lambda, 
-								listinsert(nb_ideals,#lambda,pr); mapput(bound_map,[[1,lambda[m]],[eps1,eps2,0,k-1]],[B,r,k]);
-								listinsert(params,[[1,lambda[m]], List([[eps1,eps2,0,k-1]])],s+m)
-							)
-						),
+						if(flag == 0, listput(reducible,[l,"index"]),listput(index_pr,l));
+						listinsert(nb_ideals,0,pr),
 						
 						for(m = 1,#lambda,
 							listinsert(nb_ideals,#lambda,pr); mapput(bound_map,[[0,lambda[m]],[eps1,eps2,0,k-1]],[B,r,k]);
@@ -108,6 +95,22 @@ mfreducible(f,flag = 0) = {
 						mapput(bound_map,[params[s+m][1],[eps1,eps2,0,k-1]],[B,r,k])
 					)
 				)
+			)
+		)
+	);
+	
+/* Deal with the primes dividing the index */
+	
+	if(flag == 1 && #index_pr > 0, Kf = nfinit([Pfabs,Vec(index_pr)]));
+	for(i = 1,#index_pr,
+		lambda = idealprimedec(Kf,index_pr[i]);
+		for(j = 1,#lambda,
+			L = nfmodprinit(Kf,lambda[j]);
+			p = red_params(N,k,G,eps,index_pr[i],nthroot_abs,[Kf,L]); listput(params,[[1,L],p]);
+			for(m = 1,#p,
+				[eps1,eps2,m1,m2] = p[m];
+				[B,r,kdash] = get_Bred([N,faN],k,index_pr[i],a2,eps1,eps2,m1,m2);
+				mapput(bound_map,[[1,L],[eps1,eps2,m1,m2]],[B,r,kdash])
 			)
 		)
 	);
@@ -142,5 +145,5 @@ mfreducible(f,flag = 0) = {
 			)			
 		)
 	);
-	return(reducible)
+	return([[Pfabs,nthroot_abs[1],a],Vec(reducible)])
 }

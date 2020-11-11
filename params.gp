@@ -33,17 +33,18 @@ get_kl(G,epsl,lambda,nthroot) = {
 }
 addhelp(get_kl,"Let G=znstar(N,1) and epsl be a character modulo N of conductor a power of l. Compute the only integer kl between 0 and l-2, such that epsl is congruent to the kl-th power of the cyclotomic character modulo lambda.");
 
-red_params(N,k,G,eps,l,nthroot,lambda) = {
+red_params(N,k,G0,eps,l,nthroot,lambda) = {
     my(epsl);
-    if(l == oo || (N == 2 && l == 2), epsl = 1, epsl = znchardecompose(G,eps,l)); \\Compute the l-part of eps
-    my(eps0 = chardiv(G,eps,epsl));												  \\Compute the prime-to-l part of eps
-	eps0 = znconreyexp(znstar(N,1),zncharinduce(G,eps0,N));						  \\and its Conrey label modulo N
+    if(l == oo || (N == 2 && l == 2), epsl = 1, epsl = znchardecompose(G0,eps,l)); \\Compute the l-part of eps
+    my(eps0 = chardiv(G0,eps,epsl));												  \\Compute the prime-to-l part of eps
+	my(GN = znstar(N,1));
+	eps0 = znconreyexp(GN,zncharinduce(G0,eps0,N));						  		  \\and its Conrey label modulo N
     
 /* Compute the pairs (m1,m2) */
 
 	my(M); if(l == oo,M = [[0,k-1]],
 		M = List();
-		my(kl = get_kl(G,epsl,lambda,nthroot)); \\ Compute kl
+		my(kl = get_kl(G0,epsl,lambda,nthroot)); \\ Compute kl
 		for(m1 = 0,l-2,
 			for(m2 = m1,l-2,
 				if((m1+m2-k-kl+1)%(l-1) == 0 && (2*N%l == 0 || m2+l*m1 <= k-1),listput(M,[m1,m2]))
@@ -62,8 +63,8 @@ red_params(N,k,G,eps,l,nthroot,lambda) = {
         for(i2 = i1,#Lifts,
             if(Mod(Lifts[i1]*Lifts[i2],N) == Mod(eps0,N),
 			
-                [G1,eps1] = znchartoprimitive(G,Lifts[i1]); c1 = G1.mod;		\\Compute the primitive characters
-                [G2,eps2] = znchartoprimitive(G,Lifts[i2]); c2 = G2.mod;		\\associated to eps1 and eps2
+                [G1,eps1] = znchartoprimitive(GN,Lifts[i1]); c1 = G1.mod;		\\Compute the primitive characters
+                [G2,eps2] = znchartoprimitive(GN,Lifts[i2]); c2 = G2.mod;		\\associated to eps1 and eps2
                 fa = factor(N/(c1*c2)); bool = (l == oo || c1*c2%l != 0); i = 1;\\Check the conditions on the conductors
 				
                 while(bool == 1 && i <= #fa[,1],
@@ -108,7 +109,7 @@ mfnorm(af,Pf,Pfcyclo,aE,PEcyclo) = {
 }
 
 big_primes(N,vf,Pf,Pfcyclo,vE,PEcyclo,C = 0,r = 1) = {
-	my(pr = Mat(vE)[,1],af,aE);
+	my(pr = if(matsize(Mat(vE)) == [0,0],[],Mat(vE)[,1]),af,aE);
 	my(L); if(r > 1,L = 0,L = mfnorm(C,Pf,Pfcyclo,0,PEcyclo));
 	
 	my(i = 1,p); while(L != 1 && i <= #pr,

@@ -1,16 +1,18 @@
 bad(l,N,fa = 0) = {
-  if(l == 2 && N == 1,return(1));
-  if(fa == 0, fa = factor(N)[,1],fa = fa[,1]);
-  my(bool = 1,i = 1);
-  while(bool && i <= #fa,
-    bool = (fa[i]%9 == 1);
-    i++
-  ); return(bool)
+	if(l == 2 && N == 1,return(1));
+	if(l == 3,
+		if(fa == 0, fa = factor(N)[,1],fa = fa[,1]);
+		my(bool = 1,i = 1);
+		while(bool && i <= #fa,
+			bool = (fa[i]%9 == 1);
+			i++
+		); return(bool)
+	); return(0)
 }
 
 get_a(l,N,k1,m1,k2,m2,fa = 0) = {
   if(fa == 0, fa = factor(N));
-  if(l == 3 && (k2-k1+2*(m2-m1)+2)%4 == 0 && bad(l,N,fa),
+  if((k2-k1+2*(m2-m1)+2)%4 == 0 && bad(l,N,fa),
     return(4), 
 	return(0)
   )
@@ -60,12 +62,22 @@ get_Bred(N,k,l,a2,eps1,eps2,m1,m2) = {
 	if(type(eps2) == "t_VEC", eps2 = Mod(eps2[1],eps2[2]));
 	my(kdash = get_kdash(l,m1,m2));
 	
-	my(r = get_r(l,kdash,eps1,eps2,m1,m2));
+	my(r = get_r(l,kdash,eps1,eps2,m1,m2),fa);
 	if(type(N) == "t_INT",fa = factor(N),[N,fa] = N);
-	my(Ndash = get_Ndash(N,a2,r),fa);
+	my(Ndash = get_Ndash(N,a2,r));
+	fa = matreduce(matconcat([fa,factor(Ndash/N)]~));
 	
 	if(l == oo, 
-		return([get_B(oo,Ndash,k,0,k,0,fa),r,k]),
+		return([get_B(oo,Ndash,k,0,Ndash,k,0,fa),r,k]),
 		return([get_B(l,Ndash,k,1,Ndash,kdash,m1+1,fa),r,kdash])
 	)
+}
+
+get_Bmax(N,k,l,a2) = {
+	if(type(N) == "t_INT",fa = factor(N),[N,fa] = N);
+	my(r = 4, Ndash = get_Ndash(N,a2,r));
+	fa = matreduce(matconcat([fa,factor(Ndash/N)]~));
+	my(b = get_b(l,Ndash,fa));
+	my(kdash = if(l == 2, 2,(l-2)*b+1));
+	return(floor((b+max(k,kdash))*Ndash*prod(i = 1,#fa[,1],1+1/fa[i,1])/12))
 }

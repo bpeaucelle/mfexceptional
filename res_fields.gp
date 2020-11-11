@@ -64,8 +64,8 @@ cong(l,N,pr,mapf,lambdaf,vf,mapE,lambdaE,vE,m1 = 0,r = 1,flag = 0,C = 0) = {
 }
 
 check_cong(lambda,N,Pf,vf,PEcyclo,vE,m1,r,big = 0,C = 0) = {
-	if(matsize(Mat(vE)) == [0,0],return(1));
-	my(pr = Mat(vE)[,1],l = lambda.l,genf = lambda.gen_mod);
+	my(pr = if(matsize(Mat(vE)) == [0,0],[],Mat(vE)[,1]));
+	my(l = lambda.l,genf = lambda.gen_mod);
 
 	if(Pf == PEcyclo,
 		return(cong(l,N,pr,[genf,genf],lambda,vf,[genf,genf],lambda,vE,m1,r,big,C))

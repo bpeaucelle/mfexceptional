@@ -66,11 +66,11 @@ mfreducible(f,flag = 0) = {
 		
 		o = lcm(eps1[3],eps2[3]); if(o <= eps_ord, 		\\Compute the root of unity for the coefficients of E
 			nthrootE = nthroot_rel, 
-			nthrootE = [Mod(t,polcyclo(o)),o]
+			nthrootE = [Mod(t,polcyclo(o,t)),o]
 		); vE = mfprimecoefs([k,eps1,eps2,nthrootE],B);	\\Compute the coefficients of E
-		
+
 		L = big_primes(N,vf,Pf,Pfcyclo,vE,nthrootE[1].mod,C*(eps1 == [0,1,1]),r);	\\Compute the list of the big primes
-		
+
 		for(j = 1,#L,
 			l = L[j]; if(l > k+1 && (N*eulerphi(N))%l != 0,	\\Select only the primes that are big
 				pr = setsearch(big_pr,l);	\\Search if l has already been encounter

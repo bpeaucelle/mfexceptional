@@ -70,14 +70,13 @@ check_cong(lambda,N,Pf,vf,PEcyclo,vE,m1,r,big = 0,C = 0) = {
 	if(Pf == PEcyclo,
 		return(cong(l,N,pr,[genf,genf],lambda,vf,[genf,genf],lambda,vE,m1,r,big,C))
 	);
-
 	my(lambdaE = factor_ideal(PEcyclo,l));
 
 	my(fa,g,mapf,mapE,pr,j,bool,af,aE,a);
 	for(i = 1,#lambdaE,
-		fa = factormod(lambdaE[i].poly,gen);
-		[g,mapf] = ffextend(gen,fa[1,1]); mapE = ffembed(lambdaE[i].gen_mod,g);
+		fa = factormod([0,lambdaE[i]].poly,genf);
+		[g,mapf] = ffextend(genf,fa[1,1]); mapE = ffembed([0,lambdaE[i]].gen_mod,g);
 	
-		if(cong(l,pr,mapf,lambda,vf,mapE,lambdaE[i],vE,r,m1,big,C),return(1))
+		if(cong(l,N,pr,mapf,lambda,vf,mapE,[0,lambdaE[i]],vE,r,m1,big,C),return(1))
 	); return(0)
 }

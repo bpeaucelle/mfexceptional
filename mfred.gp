@@ -130,7 +130,7 @@ mfreducible(f,flag = 0) = {
 		for(j = 1,#p,
 			[eps1,eps2,m1,m2] = p[j];
 			[B,r,kdash] = mapget(bound_map,[lambda,p[j]]);
-			
+
 			o = lcm(eps1[3],eps2[3]); if(o <= eps_ord, 	\\Compute the root of unity for the coefficients of E
 				nthrootE = nthroot_abs, 
 				nthrootE = [Mod(t,polcyclo(o,t)),o]

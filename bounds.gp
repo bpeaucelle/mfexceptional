@@ -60,14 +60,14 @@ get_Ndash(N,a2,r) = {
 get_Bred(N,k,l,a2,eps1,eps2,m1,m2) = {
 	if(type(eps1) == "t_VEC", eps1 = Mod(eps1[1],eps1[2]));
 	if(type(eps2) == "t_VEC", eps2 = Mod(eps2[1],eps2[2]));
+
 	my(kdash = get_kdash(l,m1,m2));
-	
 	my(r = get_r(l,kdash,eps1,eps2,m1,m2),fa);
 	if(type(N) == "t_INT",fa = factor(N),[N,fa] = N);
 	my(Ndash = get_Ndash(N,a2,r));
 	fa = matreduce(matconcat([fa,factor(Ndash/N)]~));
 	
-	if(l == oo, 
+	if(l == oo || (l > k+1 && N*eulerphi(N)%l != 0), 
 		return([get_B(oo,Ndash,k,0,Ndash,k,0,fa),r,k]),
 		return([get_B(l,Ndash,k,1,Ndash,kdash,m1+1,fa),r,kdash])
 	)

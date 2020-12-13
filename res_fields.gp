@@ -49,7 +49,6 @@ addhelp(modpr,"Given an element of a number field as a PolMod and a prime ideal 
 
 cong(l,N,pr,mapf,lambdaf,vf,mapE,lambdaE,vE,m1 = 0,r = 1,flag = 0,C = 0) = {
 	my(bool = (flag == 0 || modpr(C,lambdaf) == 0), j = 1);
-
 	while(bool && j <= #pr,
 		if(r%pr[j] != 0 && (flag == 1 || pr[j] != l),
 			af = ffmap(mapf,modpr(mapget(vf,pr[j]),lambdaf));
@@ -72,11 +71,11 @@ check_cong(lambda,N,Pf,vf,PEcyclo,vE,m1,r,big = 0,C = 0) = {
 	);
 	my(lambdaE = factor_ideal(PEcyclo,l));
 
-	my(fa,g,mapf,mapE,pr,j,bool,af,aE,a);
+	my(fa,g,mapf,mapE,j,bool,af,aE,a);
 	for(i = 1,#lambdaE,
 		fa = factormod([0,lambdaE[i]].poly,genf);
 		[g,mapf] = ffextend(genf,fa[1,1]); mapE = ffembed([0,lambdaE[i]].gen_mod,g);
 	
-		if(cong(l,N,pr,mapf,lambda,vf,mapE,[0,lambdaE[i]],vE,r,m1,big,C),return(1))
+		if(cong(l,N,pr,mapf,lambda,vf,mapE,[0,lambdaE[i]],vE,m1,r,big,C),return(1))
 	); return(0)
 }

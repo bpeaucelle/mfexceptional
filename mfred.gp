@@ -77,7 +77,7 @@ mfreducible(f,flag = 0) = {
 				if(pr == 0,
 				
 					pr = setsearch(big_pr,l,1); listinsert(big_pr,l,pr);					\\If no, add it to big_pr,
-					lambda = factor_ideal(Pfabs,l); s = nb_pr+sum(m = 1,pr-1,nb_ideals[m]);	\\compute the prime ideals in Kf above it,
+					lambda = factor_ideal(Pfabs,l); s = nb_pr+sum(m = 1,pr-1,nb_ideals[m]);		\\compute the prime ideals in Kf above it,
 					
 					if(lambda == "index",
 						if(flag == 0, listput(reducible,[l,"index"]),listput(index_pr,l));
@@ -89,9 +89,9 @@ mfreducible(f,flag = 0) = {
 						)
 					),
 					
-					s = nb_pr+sum(m = 1,pr-1,nb_ideals[m]);											\\If yes,
+					s = nb_pr+sum(m = 1,pr-1,nb_ideals[m]);									\\If yes,
 					for(m = 1,nb_ideals[pr],
-						listput(params[s+m][2],[eps1,eps2,0,k-1]);	\\just add the parameters in the right spot.
+						listput(params[s+m][2],[eps1,eps2,0,k-1]);								\\just add the parameters in the right spot.
 						mapput(bound_map,[params[s+m][1],[eps1,eps2,0,k-1]],[B,r,k])
 					)
 				)
@@ -123,7 +123,7 @@ mfreducible(f,flag = 0) = {
 	); C = substvec(liftall(C),[y,t],[y-a*nthroot_abs[1],nthroot_abs[1]]);
 	
 /* Check congruences */
-	
+
 	my(eps1,eps2,m1,m2,lambda,p,B,r,kdash,big,L);
 	for(i = 1,#params,
 		[lambda,p] = params[i];
@@ -135,14 +135,12 @@ mfreducible(f,flag = 0) = {
 				nthrootE = nthroot_abs, 
 				nthrootE = [Mod(t,polcyclo(o,t)),o]
 			);
-			
 			vE = mfprimecoefs([kdash,eps1,eps2,nthrootE],B);	\\Compute the coefficients of E
-			
 			big = (lambda.l > k+1 && (N*eulerphi(N))%lambda.l != 0);
 			if(lambda[1] == 1,L = [Kf,lambda[2]],L = lambda);			
 			if(check_cong(L,N,Pfabs,vf_abs,nthrootE[1].mod,vE,m1,r,big,C*(eps1 == [0,1,1])),
 				listput(reducible,[lambda[2],[eps1[1..2],eps2[1..2],m1,m2]])
-			)			
+			)
 		)
 	);
 	return([[Pfabs,nthroot_abs[1],a],Vec(reducible)])

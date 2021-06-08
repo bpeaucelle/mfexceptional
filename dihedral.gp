@@ -74,7 +74,7 @@ dih_big(vf,Gtheta,theta,lvl,B) = {
 	my(L = 0,j = 1,ctheta = Gtheta.mod);
 	my([N,k,ceps,epsp] = lvl);
 	
-	while(L != 1 && vf[j,1] <= B,
+	while(L != 1 && j <= #vf[,1] && vf[j,1] <= B,
 		p = vf[j,1]; af = vf[j,2];
 		if(N%p != 0,
 			L = gcd(L,norm(af*(1-chareval(Gtheta,theta,p,[-1,2]))))
@@ -147,46 +147,66 @@ mfdihedral(f,flag = 0) = {
 
 /* Computation of the various bounds */
 
-	my(bound_map = Map(),params = List());
+	my(vf = mfprimecoefs(f,50));
+	my(vf_abs = Map(), vf = Mat(vf));
+	for(i = 1,#vf[,1],
+		mapput(vf_abs,vf[i,1],substvec(liftall(vf[i,2]),[y,'t],[y-a*nthroot[1],nthroot[1]]))
+	); vf_abs = Mat(vf_abs);
+	my(epsp = Map(matrix(#fa1,2,i,j,if(j == 1,fa1[i],charevalp(G,eps,fa1[i],nthroot)))));
+
+	my(bound_map = Map(),params = List(),pr,lambda,index = List(),paramslambda);
 	my(Bmax = dih_bound(oo,znstar(8,1),3,0,[N,k,ceps,fa,fa0],flag2),B,P);
 	my(theta,ctheta,Gtheta,thetaN,o,bool,n);
 	for(i = 1,#small_pr,
-		l = small_pr[i]; paramsl = List();
+		l = small_pr[i];
 		
 	/* Bound for (theta,e) = (1,1) */
 	
-		[B,P] = dih_bound(l,znstar(1,1),0,1,[N,k,ceps,fa,fa0]);
-		mapput(bound_map,[l,0,znstar(1,1),1],[B,P]);
-		listput(paramsl,[0,znstar(1,1),1]);
-		Bmax = B;
+		pr = factor_ideal(Pfabs,l);
+		if(pr == "index",
+			listput(index,l),
+			for(p = 1,#pr,
+				lambda = pr[p]; paramslambda = List();
+				
+				[B,P] = dih_bound(l,znstar(1,1),0,1,[N,k,ceps,fa,fa0]);
+				if(dih_cong([0,lambda],vf_abs,znstar(1,1),0,1,[N,k,fa0,fa1,epsp],50,P),
+					mapput(bound_map,[lambda,0,znstar(1,1),1],[B,P]);
+					listput(paramslambda,[0,znstar(1,1),1]);
+					Bmax = B
+				);
 
 	/* Select the characters of TNeps that are compatible with the prime l */
 		
-		for(j = 1,#TNeps,
-			[theta,Gtheta] = TNeps[j]; ctheta = Gtheta.mod;
-			if(#fa1 > 0, thetaN = zncharinduce(Gtheta,theta,G));
-			bool = (ctheta%l != 0); n = 1;
-			while(bool && n <= #fa1,
-				if(ctheta%fa1[n] == 0,
-					o = charorder(G,znchardecompose(G,charmul(G,eps,thetaN),fa1[n]));
-					if(isprimepower(l*o) == 0, bool = 0)
-				); n++
-			);
+				for(j = 1,#TNeps,
+					[theta,Gtheta] = TNeps[j]; ctheta = Gtheta.mod;
+					if(#fa1 > 0, thetaN = zncharinduce(Gtheta,theta,G));
+					bool = (ctheta%l != 0); n = 1;
+					while(bool && n <= #fa1,
+						if(ctheta%fa1[n] == 0,
+						o = charorder(G,znchardecompose(G,charmul(G,eps,thetaN),fa1[n]));
+						if(isprimepower(l*o) == 0, bool = 0)
+						); n++
+					);
 	
 	/* Compute the bound for e = 0 and e = 1, if the character is compatible */
 	
-			if(bool,
-				listput(paramsl,[theta,Gtheta,0]);
-				[B,P] = dih_bound(l,Gtheta,theta,0,[N,k,ceps,fa,fa0]);
-				mapput(bound_map,[l,theta,Gtheta,0],[B,P]);
-				Bmax = max(Bmax,B);
-				
-				listput(paramsl,[theta,Gtheta,1]);
-				[B,P] = dih_bound(l,Gtheta,theta,1,[N,k,ceps,fa,fa0]);
-				mapput(bound_map,[l,theta,Gtheta,1],[B,P]);
-				Bmax = max(Bmax,B)
+					if(bool,
+						[B,P] = dih_bound(l,Gtheta,theta,0,[N,k,ceps,fa,fa0]);
+						if(dih_cong([0,lambda],vf_abs,Gtheta,theta,0,[N,k,fa0,fa1,epsp],50,P),
+							listput(paramslambda,[theta,Gtheta,0]);
+							mapput(bound_map,[lambda,theta,Gtheta,0],[B,P]);
+							Bmax = max(Bmax,B)
+						);
+						[B,P] = dih_bound(l,Gtheta,theta,1,[N,k,ceps,fa,fa0]);
+						if(dih_cong([0,lambda],vf_abs,Gtheta,theta,0,[N,k,fa0,fa1,epsp],50,P),
+							listput(paramslambda,[theta,Gtheta,1]);
+							mapput(bound_map,[lambda,theta,Gtheta,1],[B,P]);
+							Bmax = max(Bmax,B)
+						)
+					)
+				); listput(params,[lambda,paramslambda])
 			)
-		); listput(params,[l,paramsl]);
+		)
 	);
 	
 /* Compute the big primes */
@@ -222,7 +242,6 @@ mfdihedral(f,flag = 0) = {
 	for(i = 1,#vf[,1],
 		mapput(vf_abs,vf[i,1],substvec(liftall(vf[i,2]),[y,'t],[y-a*nthroot[1],nthroot[1]]));
 	); vf_abs = Mat(vf_abs);
-	my(epsp = Map(matrix(#fa1,2,i,j,if(j == 1,fa1[i],charevalp(G,eps,fa1[i],nthroot)))));
 	
 	/* Compute the big primes for each character */
 
@@ -246,19 +265,22 @@ mfdihedral(f,flag = 0) = {
 			)
 		)
 	);
-	my(dihedral = List(),index = List(),p,pr);
+	my(dihedral = List(),p);
 	for(i = 1,#params,
-		[l,p] = params[i];
-		pr = factor_ideal(Pfabs,l);
-		if(pr == "index", listput(index,l),
+		[lambda,p] = params[i];
+		if(type(lambda) == "t_INT",
+			pr = factor_ideal(Pfabs,lambda),
+			pr = [lambda]
+		);
+		if(pr == "index",
+			listput(index,l),	
 			
 			for(j = 1,#pr,
-				lambda = pr[j];
 				for(n = 1,#p,
 					[theta,Gtheta,e] = p[n];
-					[B,P] = mapget(bound_map,[l,theta,Gtheta,e]);
-					if(dih_cong([0,lambda],vf_abs,Gtheta,theta,e,[N,k,fa0,fa1,epsp],B,P),
-						listput(dihedral,[lambda,[theta,Gtheta.mod,e]])
+					[B,P] = mapget(bound_map,[lambda,theta,Gtheta,e]);
+					if(dih_cong([0,pr[j]],vf_abs,Gtheta,theta,e,[N,k,fa0,fa1,epsp],B,P),
+						listput(dihedral,[pr[j],[theta,Gtheta.mod,e]])
 					)
 				)
 			)

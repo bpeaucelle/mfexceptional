@@ -64,7 +64,7 @@ mfreducible(f,flag = 0) = {
 		[eps1,eps2,m1,m2] = big_params[i];	\\Get the parameters
 		[B,r] = get_Bred([N,faN],k,oo,a2,eps1,eps2,m1,m2);	\\Compute the bound
 		
-		o = lcm(eps1[3],eps2[3]); if(o <= eps_ord, 		\\Compute the root of unity for the coefficients of E
+		o = lcm(eps1[3],eps2[3]); if(eps_ord%o == 0, 		\\Compute the root of unity for the coefficients of E
 			nthrootE = nthroot_rel, 
 			nthrootE = [Mod(t,polcyclo(o,t)),o]
 		); vE = mfprimecoefs([k,eps1,eps2,nthrootE],B);	\\Compute the coefficients of E
@@ -131,17 +131,19 @@ mfreducible(f,flag = 0) = {
 			[eps1,eps2,m1,m2] = p[j];
 			[B,r,kdash] = mapget(bound_map,[lambda,p[j]]);
 
-			o = lcm(eps1[3],eps2[3]); if(o <= eps_ord, 	\\Compute the root of unity for the coefficients of E
+			o = lcm(eps1[3],eps2[3]); if(eps_ord%o == 0, 	\\Compute the root of unity for the coefficients of E
 				nthrootE = nthroot_abs, 
 				nthrootE = [Mod(t,polcyclo(o,t)),o]
 			);
 			vE = mfprimecoefs([kdash,eps1,eps2,nthrootE],B);	\\Compute the coefficients of E
 			big = (lambda.l > k+1 && (N*eulerphi(N))%lambda.l != 0);
 			if(lambda[1] == 1,L = [Kf,lambda[2]],L = lambda);			
-			if(check_cong(L,N,Pfabs,vf_abs,nthrootE[1].mod,vE,m1,r,big,C*(eps1 == [0,1,1])),
+			bool = check_cong(L,N,Pfabs,vf_abs,nthrootE[1].mod,vE,m1,r,big,C*(eps1 == [0,1,1]));
+			if(bool,
 				listput(reducible,[lambda[2],[eps1[1..2],eps2[1..2],m1,m2]])
 			)
 		)
 	);
+
 	return([[Pfabs,nthroot_abs[1],a],Vec(reducible)])
 }

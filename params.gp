@@ -57,7 +57,7 @@ red_params(N,k,G0,eps,l,nthroot,lambda) = {
 	my(E = List());
     my(Lifts = if(l == oo,[m | m <- [0..N-1], gcd(m,N) == 1],Tlifts(N,l)));	\\Compute the Teichmuller lifts mod l
     eps0 = Tlift(N,eps0,l,Lifts); 										    \\Compute the Teichmuller lift modulo l of the prime-to-l part of eps
-
+	
     my(G1,G2,eps1,eps2,c1,c2,o1,o2,fa,bool,i);
     for(i1 = 1,#Lifts,
         for(i2 = i1,#Lifts,

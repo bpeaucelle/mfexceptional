@@ -76,6 +76,7 @@ check_cong(lambda,N,Pf,vf,PEcyclo,vE,m1,r,big = 0,C = 0) = {
 		fa = factormod([0,lambdaE[i]].poly,genf);
 		[g,mapf] = ffextend(genf,fa[1,1]); mapE = ffembed([0,lambdaE[i]].gen_mod,g);
 	
-		if(cong(l,N,pr,mapf,lambda,vf,mapE,[0,lambdaE[i]],vE,m1,r,big,C),return(1))
+		bool = cong(l,N,pr,mapf,lambda,vf,mapE,[0,lambdaE[i]],vE,m1,r,big,C);
+		if(bool,return(1))
 	); return(0)
 }
